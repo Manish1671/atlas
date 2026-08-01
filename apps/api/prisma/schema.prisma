@@ -1,72 +1,291 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+generator client {
+  provider = "prisma-client-js"
+}
 
-enum Role { STUDENT MENTOR ADMIN }
-enum EventType { ACADEMIC CODING CAREER ACHIEVEMENT SYSTEM }
-enum RiskLevel { LOW MEDIUM HIGH }
-enum ApplicationStatus { SAVED APPLIED INTERVIEWING OFFER REJECTED }
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  MENTOR
+  ADMIN
+}
+
+enum EventType {
+  ACADEMIC
+  CODING
+  CAREER
+  ACHIEVEMENT
+  SYSTEM
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ApplicationStatus {
+  SAVED
+  APPLIED
+  INTERVIEWING
+  OFFER
+  REJECTED
+}
 
 model User {
-  id String @id @default(cuid())
-  email String @unique
-  passwordHash String?
-  name String
-  role Role @default(STUDENT)
+  id              String         @id @default(cuid())
+  email           String         @unique
+  passwordHash    String?
+  name            String
+  role            Role           @default(STUDENT)
   emailVerifiedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  student Student?
-  mentor Mentor?
-  refreshTokens RefreshToken[]
-  oauthAccounts OAuthAccount[]
-  auditLogs AuditLog[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  student         Student?
+  mentor          Mentor?
+  refreshTokens   RefreshToken[]
+  oauthAccounts   OAuthAccount[]
+  auditLogs       AuditLog[]
 }
 
 model Student {
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio String?
-  githubUsername String?
-  linkedInUrl String?
-  portfolioUrl String?
-  resumeUrl String?
-  careerGoals String[] @default([])
-  interests String[] @default([])
-  targetCompanies String[] @default([])
-  preferredDomains String[] @default([])
-  weeklyStudyHours Int @default(0)
-  readinessScore Int @default(0)
-  riskLevel RiskLevel @default(LOW)
-  skills Skill[]
-  semesters Semester[]
-  projects Project[]
-  certificates Certificate[]
-  timelineEvents TimelineEvent[]
-  recommendations Recommendation[]
-  applications Application[]
-  weeklyReports WeeklyReport[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio              String?
+  githubUsername   String?
+  linkedInUrl      String?
+  portfolioUrl     String?
+  resumeUrl        String?
+  careerGoals      String[]         @default([])
+  interests        String[]         @default([])
+  targetCompanies  String[]         @default([])
+  preferredDomains String[]         @default([])
+  weeklyStudyHours Int              @default(0)
+  readinessScore   Int              @default(0)
+  riskLevel        RiskLevel        @default(LOW)
+  skills           Skill[]
+  semesters        Semester[]
+  projects         Project[]
+  certificates     Certificate[]
+  timelineEvents   TimelineEvent[]
+  recommendations  Recommendation[]
+  applications     Application[]
+  weeklyReports    WeeklyReport[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
   @@index([readinessScore])
   @@index([riskLevel])
 }
 
-model Mentor { id String @id @default(cuid()) userId String @unique user User @relation(fields: [userId], references: [id], onDelete: Cascade) specialization String? }
-model Skill { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) name String level Int @default(1) category String @@index([name]) }
-model Semester { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) number Int cgpa Float? credits Int @default(0) subjects Subject[] @@unique([studentId, number]) }
-model Subject { id String @id @default(cuid()) semesterId String semester Semester @relation(fields: [semesterId], references: [id], onDelete: Cascade) name String credits Int attendance Attendance[] assignments Assignment[] internalMarks Float? backlog Boolean @default(false) }
-model Attendance { id String @id @default(cuid()) subjectId String subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade) date DateTime present Boolean }
-model Assignment { id String @id @default(cuid()) subjectId String subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade) title String dueDate DateTime submittedAt DateTime? score Float? }
-model Project { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) title String description String stack String[] repoUrl String? liveUrl String? qualityScore Int @default(0) }
-model Certificate { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) title String issuer String issuedAt DateTime credentialUrl String? }
-model TimelineEvent { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) title String description String type EventType date DateTime tags String[] @default([]) images String[] @default([]) attachments String[] @default([]) aiSummary String? metadata Json @default("{}") createdAt DateTime @default(now()) @@index([studentId, date]) @@index([type]) }
-model Recommendation { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) title String reason String priority Int @default(1) completedAt DateTime? dueDate DateTime? metadata Json @default("{}") createdAt DateTime @default(now()) @@index([studentId, completedAt]) }
-model Company { id String @id @default(cuid()) name String @unique domain String? applications Application[] }
-model Application { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) companyId String company Company @relation(fields: [companyId], references: [id]) role String status ApplicationStatus @default(SAVED) interviews Interview[] }
-model Interview { id String @id @default(cuid()) applicationId String application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade) scheduledAt DateTime feedback String? score Int? }
-model Notification { id String @id @default(cuid()) userId String title String body String readAt DateTime? createdAt DateTime @default(now()) }
-model WeeklyReport { id String @id @default(cuid()) studentId String student Student @relation(fields: [studentId], references: [id], onDelete: Cascade) weekStart DateTime studyHours Float codingHours Float githubCommits Int leetcodeSolved Int attendanceRate Float? cgpaTrend Float? achievements String[] @default([]) missedGoals String[] @default([]) aiSummary String recommendations Json @default("[]") pdfUrl String? createdAt DateTime @default(now()) @@unique([studentId, weekStart]) }
-model RefreshToken { id String @id @default(cuid()) userId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) tokenHash String @unique expiresAt DateTime revokedAt DateTime? createdAt DateTime @default(now()) }
-model OAuthAccount { id String @id @default(cuid()) userId String user User @relation(fields: [userId], references: [id], onDelete: Cascade) provider String providerAccountId String accessToken String? refreshToken String? @@unique([provider, providerAccountId]) }
-model AuditLog { id String @id @default(cuid()) userId String? user User? @relation(fields: [userId], references: [id]) action String entity String entityId String? metadata Json @default("{}") createdAt DateTime @default(now()) @@index([entity, entityId]) }
+model Mentor {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialization String?
+}
+
+model Skill {
+  id        String  @id @default(cuid())
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  name      String
+  level     Int     @default(1)
+  category  String
+
+  @@index([name])
+}
+
+model Semester {
+  id        String    @id @default(cuid())
+  studentId String
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  number    Int
+  cgpa      Float?
+  credits   Int       @default(0)
+  subjects  Subject[]
+
+  @@unique([studentId, number])
+}
+
+model Subject {
+  id            String       @id @default(cuid())
+  semesterId    String
+  semester      Semester     @relation(fields: [semesterId], references: [id], onDelete: Cascade)
+  name          String
+  credits       Int
+  attendance    Attendance[]
+  assignments   Assignment[]
+  internalMarks Float?
+  backlog       Boolean      @default(false)
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  subjectId String
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  date      DateTime
+  present   Boolean
+}
+
+model Assignment {
+  id          String    @id @default(cuid())
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title       String
+  dueDate     DateTime
+  submittedAt DateTime?
+  score       Float?
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  stack        String[]
+  repoUrl      String?
+  liveUrl      String?
+  qualityScore Int      @default(0)
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title         String
+  issuer        String
+  issuedAt      DateTime
+  credentialUrl String?
+}
+
+model TimelineEvent {
+  id          String    @id @default(cuid())
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  type        EventType
+  date        DateTime
+  tags        String[]  @default([])
+  images      String[]  @default([])
+  attachments String[]  @default([])
+  aiSummary   String?
+  metadata    Json      @default("{}")
+  createdAt   DateTime  @default(now())
+
+  @@index([studentId, date])
+  @@index([type])
+}
+
+model Recommendation {
+  id          String    @id @default(cuid())
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  reason      String
+  priority    Int       @default(1)
+  completedAt DateTime?
+  dueDate     DateTime?
+  metadata    Json      @default("{}")
+  createdAt   DateTime  @default(now())
+
+  @@index([studentId, completedAt])
+}
+
+model Company {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  domain       String?
+  applications Application[]
+}
+
+model Application {
+  id         String            @id @default(cuid())
+  studentId  String
+  student    Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  companyId  String
+  company    Company           @relation(fields: [companyId], references: [id])
+  role       String
+  status     ApplicationStatus @default(SAVED)
+  interviews Interview[]
+}
+
+model Interview {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  scheduledAt   DateTime
+  feedback      String?
+  score         Int?
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model WeeklyReport {
+  id              String   @id @default(cuid())
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  weekStart       DateTime
+  studyHours      Float
+  codingHours     Float
+  githubCommits   Int
+  leetcodeSolved  Int
+  attendanceRate  Float?
+  cgpaTrend       Float?
+  achievements    String[] @default([])
+  missedGoals     String[] @default([])
+  aiSummary       String
+  recommendations Json     @default("[]")
+  pdfUrl          String?
+  createdAt       DateTime @default(now())
+
+  @@unique([studentId, weekStart])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model OAuthAccount {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+
+  @@unique([provider, providerAccountId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([entity, entityId])
+}
