@@ -16,7 +16,7 @@ import { eventRoutes } from "./modules/events/event.routes.js";
 import { studentRoutes } from "./modules/students/student.routes.js";
 export const app = express();
 app.use(requestId);
-app.use(pinoHttp({ logger }));
+app.use((pinoHttp as any)({ logger }));
 app.use(helmet());
 app.use(cors({ origin: env.WEB_URL, credentials: true }));
 app.use(rateLimit({ windowMs: 60_000, limit: 120 }));
