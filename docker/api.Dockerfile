@@ -1,13 +1,16 @@
 FROM node:22-alpine AS base
 WORKDIR /app
+RUN apk add --no-cache openssl
 RUN corepack enable
 COPY package.json pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/api/package.json apps/api/package.json
 RUN pnpm install --filter @atlas/api --prod=false
 COPY apps/api apps/api
 RUN pnpm --filter @atlas/api prisma:generate && pnpm --filter @atlas/api build
+
 FROM node:22-alpine AS runner
 WORKDIR /app
+RUN apk add --no-cache openssl
 ENV NODE_ENV=production
 RUN corepack enable
 
