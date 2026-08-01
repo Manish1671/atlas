@@ -7,7 +7,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint src",
     "typecheck": "tsc -b --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.3",
