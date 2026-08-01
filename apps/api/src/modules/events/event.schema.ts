@@ -1,0 +1,2 @@
+import { z } from "zod";
+export const createEventSchema = z.object({ body: z.object({ studentId: z.string().cuid(), title: z.string().min(2), description: z.string().min(2), type: z.enum(["ACADEMIC","CODING","CAREER","ACHIEVEMENT","SYSTEM"]), date: z.coerce.date(), tags: z.array(z.string()).default([]), images: z.array(z.string().url()).default([]), attachments: z.array(z.string().url()).default([]), metadata: z.record(z.unknown()).default({}) }) });

@@ -1,0 +1,6 @@
+{
+  "name": "@atlas/shared",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts"
+}

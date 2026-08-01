@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { validate } from "../../middleware/validate.js";
+import { AuthController } from "./auth.controller.js";
+import { loginSchema, registerSchema } from "./auth.schema.js";
+const router = Router();
+const controller = new AuthController();
+router.post("/register", validate(registerSchema), controller.register);
+router.post("/login", validate(loginSchema), controller.login);
+router.get("/google", (_req, res) => res.status(501).json({ message: "Configure Google OAuth credentials to enable this provider." }));
+export { router as authRoutes };

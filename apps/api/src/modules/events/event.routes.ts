@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { requireAuth } from "../../middleware/auth.js";
+import { validate } from "../../middleware/validate.js";
+import { EventController } from "./event.controller.js";
+import { createEventSchema } from "./event.schema.js";
+const router = Router();
+const controller = new EventController();
+router.post("/", requireAuth, validate(createEventSchema), controller.create);
+router.get("/students/:studentId", requireAuth, controller.search);
+export { router as eventRoutes };

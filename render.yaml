@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: atlas-api
+    env: docker
+    dockerfilePath: ./docker/api.Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+  - type: web
+    name: atlas-web
+    env: docker
+    dockerfilePath: ./docker/web.Dockerfile

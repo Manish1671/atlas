@@ -1,0 +1,22 @@
+{
+  "name": "atlas",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI-powered Student Digital Twin Platform",
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @atlas/api prisma:generate",
+    "db:migrate": "pnpm --filter @atlas/api prisma:migrate"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "eslint": "^9.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0"
+  }
+}

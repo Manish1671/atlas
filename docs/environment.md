@@ -1,0 +1,12 @@
+# Environment Variables
+
+Copy .env.example to .env. Never commit real secrets.
+
+- DATABASE_URL
+- REDIS_URL
+- JWT_ACCESS_SECRET
+- JWT_REFRESH_SECRET
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+- GEMINI_API_KEY
+- RENDER_DEPLOY_HOOK_URL

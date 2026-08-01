@@ -1,0 +1,6 @@
+{
+  "name": "@atlas/types",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts"
+}
