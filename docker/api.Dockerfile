@@ -17,6 +17,6 @@ RUN pnpm install --filter @atlas/api --prod
 
 COPY --from=base /app/apps/api/dist ./apps/api/dist
 COPY --from=base /app/apps/api/prisma ./apps/api/prisma
-RUN cd apps/api && npx prisma generate
+RUN cd apps/api && npx prisma@5 generate
 EXPOSE 4000
 CMD ["node", "apps/api/dist/index.js"]
